@@ -1,10 +1,8 @@
-//global keyboard capture via rdev
+//global keyboard capture via device_query (event-based)
 use crate::mapping::key_to_note;
 use crossbeam_channel::Sender;
-use rdev::{listen, Event, EventType, Key};
-use std::collections::HashSet;
-use std::sync::{Arc, Mutex};
-use std::thread;
+use device_query::{DeviceEvents, DeviceEventsHandler, Keycode};
+use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
 pub enum KeyEvent {
@@ -12,65 +10,32 @@ pub enum KeyEvent {
     Up(u8),
 }
 
-pub fn start_keyboard_listener(sender: Sender<KeyEvent>) {
-    let held_keys: Arc<Mutex<HashSet<Key>>> = Arc::new(Mutex::new(HashSet::new()));
-
-    thread::spawn(move || {
-        let held = held_keys.clone();
-        let callback = move |event: Event| {
-            match event.event_type {
-                EventType::KeyPress(key) => {
-                    if is_modifier(key) {
-                        return;
-                    }
-
-                    //filter auto-repeat
-                    {
-                        let mut held_guard = held.lock().unwrap();
-                        if held_guard.contains(&key) {
-                            return;
-                        }
-                        held_guard.insert(key);
-                    }
-
-                    if let Some(note) = key_to_note(key) {
-                        let _ = sender.try_send(KeyEvent::Down(note));
-                    }
-                }
-                EventType::KeyRelease(key) => {
-                    if is_modifier(key) {
-                        return;
-                    }
-
-                    {
-                        let mut held_guard = held.lock().unwrap();
-                        held_guard.remove(&key);
-                    }
-
-                    if let Some(note) = key_to_note(key) {
-                        let _ = sender.try_send(KeyEvent::Up(note));
-                    }
-                }
-                _ => {}
-            }
-        };
-
-        if let Err(e) = listen(callback) {
-            eprintln!("Keyboard listener error: {:?}", e);
-        }
-    });
+pub struct KeyboardListener {
+    _handler: DeviceEventsHandler,
+    _down_guard: Box<dyn std::any::Any + Send>,
+    _up_guard: Box<dyn std::any::Any + Send>,
 }
 
-fn is_modifier(key: Key) -> bool {
-    matches!(
-        key,
-        Key::ShiftLeft
-            | Key::ShiftRight
-            | Key::ControlLeft
-            | Key::ControlRight
-            | Key::Alt
-            | Key::AltGr
-            | Key::MetaLeft
-            | Key::MetaRight
-    )
+pub fn start_keyboard_listener(sender: Sender<KeyEvent>) -> Option<KeyboardListener> {
+    let handler = DeviceEventsHandler::new(Duration::from_millis(10))?;
+
+    let sender_down = sender.clone();
+    let down_guard = handler.on_key_down(move |key: &Keycode| {
+        if let Some(note) = key_to_note(*key) {
+            let _ = sender_down.try_send(KeyEvent::Down(note));
+        }
+    });
+
+    let sender_up = sender;
+    let up_guard = handler.on_key_up(move |key: &Keycode| {
+        if let Some(note) = key_to_note(*key) {
+            let _ = sender_up.try_send(KeyEvent::Up(note));
+        }
+    });
+
+    Some(KeyboardListener {
+        _handler: handler,
+        _down_guard: Box::new(down_guard),
+        _up_guard: Box::new(up_guard),
+    })
 }

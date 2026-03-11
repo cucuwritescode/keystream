@@ -26,12 +26,18 @@ fn main() {
     let _audio = match AudioEngine::new(receiver) {
         Ok(engine) => engine,
         Err(e) => {
-            eprintln!("Failed to initialize audio: {}", e);
+            eprintln!("Failed to initialise audio: {}", e);
             return;
         }
     };
 
-    start_keyboard_listener(sender);
+    let _keyboard = match start_keyboard_listener(sender) {
+        Some(listener) => listener,
+        None => {
+            eprintln!("Failed to initialise keyboard listener");
+            return;
+        }
+    };
 
     println!("keystream running. Press Ctrl+C to exit.");
 
