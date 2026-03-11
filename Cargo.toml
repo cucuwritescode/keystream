@@ -1,0 +1,10 @@
+[package]
+name = "keystream"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cpal = "0.15"
+rdev = "0.5"
+crossbeam-channel = "0.5"
+ctrlc = "3.4"
