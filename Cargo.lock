@@ -398,6 +398,7 @@ dependencies = [
 name = "keystream"
 version = "0.1.0"
 dependencies = [
+ "core-foundation",
  "cpal",
  "crossbeam-channel",
  "ctrlc",

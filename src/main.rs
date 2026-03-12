@@ -10,9 +10,45 @@ use keyboard::start_keyboard_listener;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+#[cfg(target_os = "macos")]
+use core_foundation::base::TCFType;
+#[cfg(target_os = "macos")]
+use core_foundation::boolean::CFBoolean;
+#[cfg(target_os = "macos")]
+use core_foundation::dictionary::CFDictionary;
+#[cfg(target_os = "macos")]
+use core_foundation::string::CFString;
+
 const EVENT_QUEUE_SIZE: usize = 256;
 
+#[cfg(target_os = "macos")]
+extern "C" {
+    fn AXIsProcessTrustedWithOptions(options: core_foundation::dictionary::CFDictionaryRef) -> bool;
+    fn AXIsProcessTrusted() -> bool;
+}
+
+#[cfg(target_os = "macos")]
+fn request_accessibility_permission() -> bool {
+    let key = CFString::new("AXTrustedCheckOptionPrompt");
+    let value = CFBoolean::true_value();
+    let options = CFDictionary::from_CFType_pairs(&[(key.as_CFType(), value.as_CFType())]);
+    unsafe { AXIsProcessTrustedWithOptions(options.as_concrete_TypeRef()) }
+}
+
+#[cfg(target_os = "macos")]
+fn has_accessibility_permission() -> bool {
+    unsafe { AXIsProcessTrusted() }
+}
+
 fn main() {
+    #[cfg(target_os = "macos")]
+    if !has_accessibility_permission() {
+        eprintln!("Requesting Accessibility permission...");
+        request_accessibility_permission();
+        eprintln!("Please grant permission, then restart the app.");
+        std::process::exit(1);
+    }
+
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
 
