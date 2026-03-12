@@ -3,9 +3,9 @@
 <plist version="1.0">
     <dict>
         <key>Label</key>
-        <string>com.gauchodsp.keyStream</string>
+        <string>com.gauchodsp.keystream</string>
         <key>Program</key>
-        <string>/Applications/keyStream</string>
+        <string>/usr/local/bin/keystream</string>
         <key>RunAtLoad</key>
         <true/>
     </dict>
