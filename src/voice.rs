@@ -5,10 +5,41 @@ pub const MAX_VOICES: usize = 32;
 const ATTACK_TIME_MS: f32 = 5.0;
 const RELEASE_TIME_MS: f32 = 200.0;
 
+//precomputed coefficients for all 128 MIDI notes
+pub struct NoteTable {
+    coeffs: [f32; 128],
+    y1_init: [f32; 128],
+}
+
+impl NoteTable {
+    pub fn new(sample_rate: f32) -> Self {
+        let mut coeffs = [0.0f32; 128];
+        let mut y1_init = [0.0f32; 128];
+
+        for note in 0..128 {
+            let freq = 440.0 * 2.0_f32.powf((note as f32 - 69.0) / 12.0);
+            let omega = 2.0 * PI * freq / sample_rate;
+            coeffs[note] = 2.0 * omega.cos();
+            y1_init[note] = omega.sin();
+        }
+
+        Self { coeffs, y1_init }
+    }
+
+    pub fn coeff(&self, note: u8) -> f32 {
+        self.coeffs[note as usize]
+    }
+
+    pub fn y1_init(&self, note: u8) -> f32 {
+        self.y1_init[note as usize]
+    }
+}
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum VoiceState {
     Off,
     Attack,
+    Sustain,
     Release,
 }
 
@@ -40,26 +71,21 @@ impl Voice {
         }
     }
 
-    pub fn start(&mut self, note: u8, sample_rate: f32, current_time: u64) {
-        let freq = midi_to_freq(note);
-        let omega = 2.0 * PI * freq / sample_rate;
-
-        self.coeff = 2.0 * omega.cos();
-        self.y1 = omega.sin();
+    //no trig here - uses precomputed values
+    pub fn start(&mut self, note: u8, table: &NoteTable, attack_step: f32, release_step: f32, current_time: u64) {
+        self.coeff = table.coeff(note);
+        self.y1 = table.y1_init(note);
         self.y2 = 0.0;
         self.env = 0.0;
         self.state = VoiceState::Attack;
         self.note_id = note;
         self.age = current_time;
-
-        let attack_samples = (ATTACK_TIME_MS / 1000.0) * sample_rate;
-        let release_samples = (RELEASE_TIME_MS / 1000.0) * sample_rate;
-        self.attack_step = 1.0 / attack_samples;
-        self.release_step = 1.0 / release_samples;
+        self.attack_step = attack_step;
+        self.release_step = release_step;
     }
 
     pub fn release(&mut self) {
-        if self.state == VoiceState::Attack {
+        if self.state == VoiceState::Attack || self.state == VoiceState::Sustain {
             self.state = VoiceState::Release;
         }
     }
@@ -80,8 +106,11 @@ impl Voice {
                 self.env += self.attack_step;
                 if self.env >= 1.0 {
                     self.env = 1.0;
-                    self.state = VoiceState::Release;
+                    self.state = VoiceState::Sustain;
                 }
+            }
+            VoiceState::Sustain => {
+                //hold at 1.0 until release
             }
             VoiceState::Release => {
                 self.env -= self.release_step;
@@ -101,35 +130,40 @@ impl Voice {
     }
 }
 
-fn midi_to_freq(note: u8) -> f32 {
-    440.0 * 2.0_f32.powf((note as f32 - 69.0) / 12.0)
-}
-
 pub struct VoiceManager {
     voices: [Voice; MAX_VOICES],
+    table: NoteTable,
+    attack_step: f32,
+    release_step: f32,
     time: u64,
 }
 
 impl VoiceManager {
-    pub fn new() -> Self {
+    pub fn new(sample_rate: f32) -> Self {
+        let attack_samples = (ATTACK_TIME_MS / 1000.0) * sample_rate;
+        let release_samples = (RELEASE_TIME_MS / 1000.0) * sample_rate;
+
         Self {
             voices: [Voice::new(); MAX_VOICES],
+            table: NoteTable::new(sample_rate),
+            attack_step: 1.0 / attack_samples,
+            release_step: 1.0 / release_samples,
             time: 0,
         }
     }
 
-    pub fn note_on(&mut self, note: u8, sample_rate: f32) {
+    pub fn note_on(&mut self, note: u8) {
         self.time += 1;
 
         //find a free voice or steal the oldest
         let voice_idx = self.find_free_voice().unwrap_or_else(|| self.find_oldest_voice());
 
-        self.voices[voice_idx].start(note, sample_rate, self.time);
+        self.voices[voice_idx].start(note, &self.table, self.attack_step, self.release_step, self.time);
     }
 
     pub fn note_off(&mut self, note: u8) {
         for voice in &mut self.voices {
-            if voice.note_id == note && voice.state == VoiceState::Attack {
+            if voice.note_id == note && (voice.state == VoiceState::Attack || voice.state == VoiceState::Sustain) {
                 voice.release();
             }
         }
@@ -153,7 +187,7 @@ impl VoiceManager {
         self.voices
             .iter()
             .enumerate()
-            .min_by_key(|(_, v)| v.age())
+            .max_by_key(|(_, v)| v.age())
             .map(|(i, _)| i)
             .unwrap_or(0)
     }

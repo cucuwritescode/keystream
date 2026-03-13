@@ -8,12 +8,6 @@ cpal = "0.15"
 device_query = "4.0"
 crossbeam-channel = "0.5"
 ctrlc = "3.4"
-<<<<<<< HEAD
-=======
-rdev = "0.5"
-rodio = "0.19"
-core-foundation = "0.9"
->>>>>>> 56d9cf80e25c3b66073c1e646f13ade10f2235eb
 
 [target.'cfg(target_os = "macos")'.dependencies]
 core-foundation = "0.9"

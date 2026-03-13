@@ -43,7 +43,7 @@ where
     T: cpal::Sample + cpal::SizedSample + cpal::FromSample<f32>,
 {
     let channels = config.channels as usize;
-    let mut voice_manager = VoiceManager::new();
+    let mut voice_manager = VoiceManager::new(sample_rate);
 
     let stream = device.build_output_stream(
         config,
@@ -51,7 +51,7 @@ where
             // Process events (non-blocking)
             while let Ok(event) = event_receiver.try_recv() {
                 match event {
-                    KeyEvent::Down(note) => voice_manager.note_on(note, sample_rate),
+                    KeyEvent::Down(note) => voice_manager.note_on(note),
                     KeyEvent::Up(note) => voice_manager.note_off(note),
                 }
             }
