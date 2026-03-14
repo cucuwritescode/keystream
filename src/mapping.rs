@@ -16,12 +16,6 @@ impl ScaleMode {
         }
     }
 
-    pub fn description(&self) -> &'static str {
-        match self {
-            Self::Pentatonic => "pentatonic (C D E G A)",
-            Self::Lydian => "lydian (C D E F# G A B)",
-        }
-    }
 }
 
 pub enum KeyMapping {
