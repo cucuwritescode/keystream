@@ -10,7 +10,6 @@ install:
 	sudo cp target/release/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	sudo chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "installed to $(INSTALL_DIR)/$(BINARY_NAME)"
-	mkdir -p $(PLIST_DIR)
 	cp $(PLIST_NAME) $(PLIST_DIR)/$(PLIST_NAME)
 	chmod 644 $(PLIST_DIR)/$(PLIST_NAME)
 	launchctl load $(PLIST_DIR)/$(PLIST_NAME)
