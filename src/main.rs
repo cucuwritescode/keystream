@@ -7,6 +7,8 @@ mod voice;
 use audio::AudioEngine;
 use crossbeam_channel::bounded;
 use keyboard::start_keyboard_listener;
+use mapping::{KeyMapper, ScaleMode};
+use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -40,7 +42,36 @@ fn has_accessibility_permission() -> bool {
     unsafe { AXIsProcessTrusted() }
 }
 
+fn print_usage() {
+    eprintln!("usage: keystream [mode]");
+    eprintln!();
+    eprintln!("modes:");
+    eprintln!("  pentatonic (p)  - C D E G A");
+    eprintln!("  lydian (l)      - C D E F# G A B (cinematic)");
+    eprintln!();
+    eprintln!("default: pentatonic");
+}
+
 fn main() {
+    //parse scale mode from args
+    let args: Vec<String> = env::args().collect();
+    let mode = if args.len() > 1 {
+        if args[1] == "-h" || args[1] == "--help" {
+            print_usage();
+            return;
+        }
+        match ScaleMode::from_str(&args[1]) {
+            Some(m) => m,
+            None => {
+                eprintln!("unknown mode: {}", args[1]);
+                print_usage();
+                return;
+            }
+        }
+    } else {
+        ScaleMode::Pentatonic //default
+    };
+
     #[cfg(target_os = "macos")]
     if !has_accessibility_permission() {
         eprintln!("Requesting Accessibility permission...");
@@ -67,7 +98,9 @@ fn main() {
         }
     };
 
-    let _keyboard = match start_keyboard_listener(sender) {
+    let mapper = Arc::new(KeyMapper::new(mode));
+
+    let _keyboard = match start_keyboard_listener(sender, mapper) {
         Some(listener) => listener,
         None => {
             eprintln!("Failed to initialise keyboard listener");
@@ -75,7 +108,7 @@ fn main() {
         }
     };
 
-    println!("keystream running. Press Ctrl+C to exit.");
+    println!("keystream running [{}]. Press Ctrl+C to exit.", mode.description());
 
     while running.load(Ordering::SeqCst) {
         std::thread::sleep(std::time::Duration::from_millis(100));
