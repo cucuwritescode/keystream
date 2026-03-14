@@ -1,23 +1,25 @@
 BINARY_NAME = keystream
-INSTALL_DIR = /usr/local/bin
-PLIST_DIR = ~/Library/LaunchAgents
-PLIST_NAME = com.gauchodsp.keystream.plist
+INSTALL_DIR = $(HOME)/.local/bin
 
 .PHONY: install uninstall clean
 
 install:
 	cargo build --release
-	sudo cp target/release/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
-	sudo chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
-	@echo "installed to $(INSTALL_DIR)/$(BINARY_NAME)"
-	cp $(PLIST_NAME) $(PLIST_DIR)/$(PLIST_NAME)
-	chmod 644 $(PLIST_DIR)/$(PLIST_NAME)
-	launchctl load $(PLIST_DIR)/$(PLIST_NAME)
+	@mkdir -p $(INSTALL_DIR)
+	cp target/release/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
+	chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
+	@echo ""
+	@echo "  installed to $(INSTALL_DIR)/$(BINARY_NAME)"
+	@echo ""
+	@if ! echo "$$PATH" | grep -q "$(INSTALL_DIR)"; then \
+		echo "  add to PATH:"; \
+		echo "    export PATH=\"$(INSTALL_DIR):\$$PATH\""; \
+		echo ""; \
+	fi
 
 uninstall:
-	launchctl unload $(PLIST_DIR)/$(PLIST_NAME)
-	sudo rm -f $(INSTALL_DIR)/$(BINARY_NAME)
-	rm -f $(PLIST_DIR)/$(PLIST_NAME)
+	rm -f $(INSTALL_DIR)/$(BINARY_NAME)
+	@echo "  removed $(BINARY_NAME)"
 
 clean:
 	cargo clean

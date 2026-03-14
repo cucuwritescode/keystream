@@ -4,7 +4,7 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{Device, SampleFormat, Stream, StreamConfig};
 use crossbeam_channel::Receiver;
 
-const MASTER_GAIN: f32 = 0.1;
+const MASTER_GAIN: f32 = 0.025;
 
 pub struct AudioEngine {
     _stream: Stream,
@@ -58,7 +58,9 @@ where
 
             // Generate audio
             for frame in data.chunks_mut(channels) {
-                let sample = voice_manager.process() * MASTER_GAIN;
+                let raw = voice_manager.process() * MASTER_GAIN;
+                // soft clip to prevent harsh distortion
+                let sample = raw / (1.0 + raw.abs());
                 let sample_t = T::from_sample(sample);
                 for channel in frame.iter_mut() {
                     *channel = sample_t;
