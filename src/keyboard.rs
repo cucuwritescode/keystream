@@ -1,7 +1,8 @@
 //global keyboard capture via device_query (event-based)
-use crate::mapping::{key_to_mapping, KeyMapping};
+use crate::mapping::{KeyMapper, KeyMapping};
 use crossbeam_channel::Sender;
 use device_query::{DeviceEvents, DeviceEventsHandler, Keycode};
+use std::sync::Arc;
 use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
@@ -16,12 +17,13 @@ pub struct KeyboardListener {
     _up_guard: Box<dyn std::any::Any + Send>,
 }
 
-pub fn start_keyboard_listener(sender: Sender<KeyEvent>) -> Option<KeyboardListener> {
+pub fn start_keyboard_listener(sender: Sender<KeyEvent>, mapper: Arc<KeyMapper>) -> Option<KeyboardListener> {
     let handler = DeviceEventsHandler::new(Duration::from_millis(10))?;
 
     let sender_down = sender.clone();
+    let mapper_down = mapper.clone();
     let down_guard = handler.on_key_down(move |key: &Keycode| {
-        match key_to_mapping(*key) {
+        match mapper_down.map(*key) {
             KeyMapping::Note(note) => {
                 let _ = sender_down.try_send(KeyEvent::Down(note));
             }
@@ -35,8 +37,9 @@ pub fn start_keyboard_listener(sender: Sender<KeyEvent>) -> Option<KeyboardListe
     });
 
     let sender_up = sender;
+    let mapper_up = mapper;
     let up_guard = handler.on_key_up(move |key: &Keycode| {
-        match key_to_mapping(*key) {
+        match mapper_up.map(*key) {
             KeyMapping::Note(note) => {
                 let _ = sender_up.try_send(KeyEvent::Up(note));
             }
