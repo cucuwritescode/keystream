@@ -80,12 +80,12 @@ fn start_with_invalid_mode_exits_nonzero() {
 
 #[test]
 fn version_flag_shows_version() {
-    let output = keystream().arg("--version").output().expect("failed to run");
+    let output = keystream()
+        .arg("--version")
+        .output()
+        .expect("failed to run");
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(
-        stdout.contains("keystream"),
-        "should contain binary name"
-    );
+    assert!(stdout.contains("keystream"), "should contain binary name");
     assert!(
         stdout.contains(env!("CARGO_PKG_VERSION")),
         "should contain version number"
