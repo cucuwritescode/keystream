@@ -34,13 +34,14 @@ fn no_args_shows_usage() {
 }
 
 #[test]
-fn unknown_command_prints_error() {
+fn unknown_command_exits_nonzero() {
     let output = keystream().arg("nonsense").output().expect("failed to run");
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
         stderr.contains("unknown command"),
         "should report unknown command on stderr"
     );
+    assert!(!output.status.success(), "should exit non-zero");
 }
 
 #[test]
@@ -64,7 +65,7 @@ fn stop_when_not_running() {
 }
 
 #[test]
-fn start_with_invalid_mode() {
+fn start_with_invalid_mode_exits_nonzero() {
     let output = keystream()
         .args(["start", "invalid_mode"])
         .output()
@@ -73,6 +74,31 @@ fn start_with_invalid_mode() {
     assert!(
         stderr.contains("unknown mode"),
         "should report unknown mode on stderr"
+    );
+    assert!(!output.status.success(), "should exit non-zero");
+}
+
+#[test]
+fn version_flag_shows_version() {
+    let output = keystream().arg("--version").output().expect("failed to run");
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("keystream"),
+        "should contain binary name"
+    );
+    assert!(
+        stdout.contains(env!("CARGO_PKG_VERSION")),
+        "should contain version number"
+    );
+}
+
+#[test]
+fn v_flag_shows_version() {
+    let output = keystream().arg("-v").output().expect("failed to run");
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains(env!("CARGO_PKG_VERSION")),
+        "should contain version number"
     );
 }
 

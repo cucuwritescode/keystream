@@ -196,7 +196,10 @@ fn cmd_start(mode: ScaleMode, header_shown: bool) {
             if !header_shown {
                 print_header();
             }
-            println!("failed to start daemon: {}", e);
+            println!("error: failed to start daemon. {}", e);
+            println!();
+            println!("try running in foreground mode to see detailed errors:");
+            println!("  keystream run {}", mode_name(mode));
             println!();
         }
     }
@@ -269,9 +272,15 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
         if !header_shown {
             print_header();
         }
-        println!("requesting accessibility permission...");
+        println!("error: accessibility permission required.");
+        println!();
+        println!("keystream needs accessibility access to capture keyboard input.");
+        println!("a system prompt should appear now. if not, grant permission manually:");
+        println!();
+        println!("  system settings > privacy & security > accessibility");
+        println!();
+        println!("add your terminal application, then run keystream again.");
         request_accessibility_permission();
-        println!("grant permission and restart");
         println!();
         std::process::exit(1);
     }
@@ -292,7 +301,10 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
             if !header_shown {
                 print_header();
             }
-            println!("audio initialisation failed: {}", e);
+            println!("error: audio initialisation failed. {}", e);
+            println!();
+            println!("check that an audio output device is available and not in use by");
+            println!("another application with exclusive access.");
             println!();
             return;
         }
@@ -306,7 +318,10 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
             if !header_shown {
                 print_header();
             }
-            println!("keyboard initialisation failed");
+            println!("error: keyboard initialisation failed.");
+            println!();
+            println!("ensure accessibility permission is granted:");
+            println!("  system settings > privacy & security > accessibility");
             println!();
             return;
         }
@@ -442,14 +457,19 @@ fn main() {
         return;
     }
 
+    if cmd == "-v" || cmd == "--version" {
+        println!("keystream {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
     match cmd {
         "start" => {
             let (mode, header_shown) = if args.len() >= 3 {
                 match parse_mode(&args[2]) {
                     Some(m) => (m, false),
                     None => {
-                        eprintln!("unknown mode: {}", args[2]);
-                        return;
+                        eprintln!("error: unknown mode '{}'. available modes: pentatonic, lydian.", args[2]);
+                        std::process::exit(1);
                     }
                 }
             } else {
@@ -468,8 +488,8 @@ fn main() {
                 match parse_mode(&args[2]) {
                     Some(m) => (m, false),
                     None => {
-                        eprintln!("unknown mode: {}", args[2]);
-                        return;
+                        eprintln!("error: unknown mode '{}'. available modes: pentatonic, lydian.", args[2]);
+                        std::process::exit(1);
                     }
                 }
             } else {
@@ -478,8 +498,8 @@ fn main() {
             cmd_run(mode, header_shown);
         }
         _ => {
-            eprintln!("unknown command: {}", cmd);
-            print_usage();
+            eprintln!("error: unknown command '{}'. run 'keystream --help' for usage.", cmd);
+            std::process::exit(1);
         }
     }
 }
