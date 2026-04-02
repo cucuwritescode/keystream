@@ -166,3 +166,71 @@ jobs:
             dist/keystream.sha256
             dist/*.pkg
             dist/*.pkg.sha256
+
+  update-homebrew:
+    name: update homebrew formula
+    needs: release
+    runs-on: macos-latest
+    steps:
+      - name: wait for release assets
+        run: sleep 10
+
+      - name: download binary and compute sha256
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          curl -sSL -o keystream \
+            "https://github.com/cucuwritescode/keystream/releases/download/${GITHUB_REF_NAME}/keystream"
+          SHA256=$(shasum -a 256 keystream | awk '{print $1}')
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "SHA256=${SHA256}" >> "$GITHUB_ENV"
+
+      - name: clone tap and update formula
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/cucuwritescode/homebrew-keystream.git tap
+          cd tap
+
+          cat > Formula/keystream.rb << FORMULA
+          class Keystream < Formula
+            desc "Plays sounds while you type on your keyboard"
+            homepage "https://github.com/cucuwritescode/keystream"
+            url "https://github.com/cucuwritescode/keystream/releases/download/v${VERSION}/keystream"
+            sha256 "${SHA256}"
+            version "${VERSION}"
+            license "MIT"
+
+            depends_on :macos
+
+            def install
+              bin.install "keystream"
+            end
+
+            service do
+              run [opt_bin/"keystream", "run", "pentatonic"]
+              keep_alive true
+            end
+
+            def caveats
+              <<~EOS
+                keystream requires accessibility permission to capture keyboard input.
+
+                grant permission in:
+                  system settings > privacy & security > accessibility
+
+                to start the background service:
+                  brew services start keystream
+              EOS
+            end
+
+            test do
+              assert_match "KEYSTREAM", shell_output("#{bin}/keystream --help")
+            end
+          end
+          FORMULA
+
+          git config user.name "Facundo Franchino"
+          git config user.email "anicsounds@gmail.com"
+          git add Formula/keystream.rb
+          git commit -m "update keystream to ${VERSION}"
+          git push
