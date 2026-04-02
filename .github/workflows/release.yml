@@ -80,11 +80,82 @@ jobs:
           chmod +x dist/keystream
           file dist/keystream
 
+      - name: build pkg installer
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PKG_ID="com.gauchodsp.keystream"
+          INSTALL_DIR="/usr/local/bin"
+          PLIST_DIR="/Library/LaunchAgents"
+
+          mkdir -p pkg-root${INSTALL_DIR}
+          mkdir -p pkg-root${PLIST_DIR}
+          mkdir -p pkg-scripts
+          mkdir -p pkg-resources
+
+          cp dist/keystream pkg-root${INSTALL_DIR}/keystream
+          chmod +x pkg-root${INSTALL_DIR}/keystream
+
+          sed "s|__INSTALL_DIR__|${INSTALL_DIR}|g" com.gauchodsp.keystream.plist \
+              > pkg-root${PLIST_DIR}/${PKG_ID}.plist
+
+          cat > pkg-scripts/postinstall << 'POSTINSTALL'
+          #!/bin/sh
+          PLIST="/Library/LaunchAgents/com.gauchodsp.keystream.plist"
+          CURRENT_USER=$(stat -f "%Su" /dev/console)
+          if [ -n "$CURRENT_USER" ] && [ "$CURRENT_USER" != "root" ]; then
+              su - "$CURRENT_USER" -c "launchctl load '$PLIST'" 2>/dev/null || true
+          fi
+          exit 0
+          POSTINSTALL
+          chmod +x pkg-scripts/postinstall
+
+          cat > pkg-scripts/preinstall << 'PREINSTALL'
+          #!/bin/sh
+          PLIST="/Library/LaunchAgents/com.gauchodsp.keystream.plist"
+          CURRENT_USER=$(stat -f "%Su" /dev/console)
+          if [ -f "$PLIST" ] && [ -n "$CURRENT_USER" ] && [ "$CURRENT_USER" != "root" ]; then
+              su - "$CURRENT_USER" -c "launchctl unload '$PLIST'" 2>/dev/null || true
+          fi
+          exit 0
+          PREINSTALL
+          chmod +x pkg-scripts/preinstall
+
+          cp LICENSE pkg-resources/LICENSE 2>/dev/null || true
+
+          pkgbuild \
+              --root pkg-root \
+              --scripts pkg-scripts \
+              --identifier "$PKG_ID" \
+              --version "$VERSION" \
+              --install-location / \
+              keystream-component.pkg
+
+          cat > distribution.xml << DIST
+          <?xml version="1.0" encoding="utf-8"?>
+          <installer-gui-script minSpecVersion="2">
+              <title>keystream ${VERSION}</title>
+              <license file="LICENSE"/>
+              <options customize="never" require-scripts="false"/>
+              <choices-outline><line choice="default"/></choices-outline>
+              <choice id="default" title="keystream"><pkg-ref id="${PKG_ID}"/></choice>
+              <pkg-ref id="${PKG_ID}" version="${VERSION}">keystream-component.pkg</pkg-ref>
+          </installer-gui-script>
+          DIST
+
+          productbuild \
+              --distribution distribution.xml \
+              --resources pkg-resources \
+              --package-path . \
+              "dist/keystream-${VERSION}.pkg"
+
       - name: generate checksums
         run: |
           cd dist
           shasum -a 256 keystream > keystream.sha256
-          cat keystream.sha256
+          for pkg in *.pkg; do
+              shasum -a 256 "$pkg" > "${pkg}.sha256"
+          done
+          cat *.sha256
 
       - name: create github release
         uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
@@ -93,3 +164,5 @@ jobs:
           files: |
             dist/keystream
             dist/keystream.sha256
+            dist/*.pkg
+            dist/*.pkg.sha256
