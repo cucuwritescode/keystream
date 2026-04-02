@@ -1,5 +1,5 @@
 [package]
-name = "keystream"
+name = "keystream-audio"
 version = "0.1.0"
 edition = "2021"
 description = "Plays sounds while you type on your keyboard"
@@ -8,6 +8,10 @@ license = "MIT"
 readme = "README.md"
 keywords = ["audio", "keyboard", "synthesiser", "daemon", "macos"]
 categories = ["multimedia::audio", "command-line-utilities"]
+
+[[bin]]
+name = "keystream"
+path = "src/main.rs"
 
 [dependencies]
 cpal = "0.15"

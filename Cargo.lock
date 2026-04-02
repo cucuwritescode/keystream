@@ -443,7 +443,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "keystream"
+name = "keystream-audio"
 version = "0.1.0"
 dependencies = [
  "core-foundation",
