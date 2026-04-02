@@ -1,28 +1,28 @@
-keystream
-=========
+<div align="center">
 
-[![ci](https://github.com/cucuwritescode/keystream/actions/workflows/ci.yml/badge.svg)](https://github.com/cucuwritescode/keystream/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/keystream-audio.svg)](https://crates.io/crates/keystream-audio)
-[![homebrew](https://img.shields.io/badge/homebrew-keystream-orange)](https://github.com/cucuwritescode/homebrew-keystream)
-[![license](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+# keystream
 
-plays sounds while you type on your keyboard
+**plays sounds while you type on your keyboard**
 
+[![ci](https://img.shields.io/github/actions/workflow/status/cucuwritescode/keystream/ci.yml?style=flat-square&label=ci&logo=github)](https://github.com/cucuwritescode/keystream/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/keystream-audio?style=flat-square&logo=rust&color=orange)](https://crates.io/crates/keystream-audio)
+[![homebrew](https://img.shields.io/badge/homebrew-keystream-informational?style=flat-square&logo=homebrew)](https://github.com/cucuwritescode/homebrew-keystream)
+[![licence](https://img.shields.io/badge/licence-MIT-green?style=flat-square)](LICENSE)
 
-DESCRIPTION
------------
+</div>
+
+&nbsp;
 
 keystream converts typing into pitched sine tones. each keypress
 triggers a note. the daemon runs silently in the background,
 synthesising audio in real time.
 
-the system operates with 32 concurrent voices, recursive sine
-oscillators, and sub-millisecond latency. no external dependencies
-at runtime.
+32 concurrent voices. recursive sine oscillators.
+sub-millisecond latency. no external dependencies at runtime.
 
+&nbsp;
 
-REQUIREMENTS
-------------
+## requirements
 
 ```
 macos       14.0 or later
@@ -32,31 +32,31 @@ terminal    accessibility permission required
 rust is only needed when building from source. binary installs have no
 prerequisites beyond macos itself.
 
+&nbsp;
 
-INSTALLATION
-------------
+## installation
 
-### homebrew (recommended)
+#### homebrew (recommended)
 
 ```bash
 brew tap cucuwritescode/keystream
 brew install keystream
 ```
 
-### installer (.pkg)
+#### installer (.pkg)
 
 download the `.pkg` from the
 [latest release](https://github.com/cucuwritescode/keystream/releases/latest).
 double-click to install. accessibility settings will open automatically
 after installation.
 
-### direct download
+#### direct download
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/cucuwritescode/keystream/main/scripts/install.sh | sh
 ```
 
-### cargo
+#### cargo
 
 ```bash
 cargo install keystream-audio
@@ -64,7 +64,7 @@ cargo install keystream-audio
 
 the binary installs as `keystream`.
 
-### from source
+#### from source
 
 ```bash
 git clone https://github.com/cucuwritescode/keystream
@@ -72,7 +72,9 @@ cd keystream
 make install
 ```
 
-### daemon (launchd)
+&nbsp;
+
+## daemon (launchd)
 
 to run keystream as a background service:
 
@@ -86,9 +88,9 @@ to stop and remove the daemon:
 make uninstall-daemon
 ```
 
+&nbsp;
 
-USAGE
------
+## usage
 
 ```bash
 keystream start         # initiate daemon
@@ -127,9 +129,9 @@ opening audio device...
 ONLINE
 ```
 
+&nbsp;
 
-DESIGN
-------
+## design
 
 ```
 voices          32 concurrent
@@ -144,9 +146,9 @@ punctuation     harmonic gestures
 modifiers       chords and drones
 ```
 
+&nbsp;
 
-ARCHITECTURE
-------------
+## architecture
 
 ```
 src/
@@ -157,9 +159,9 @@ src/
 └── mapping.rs      key to pitch translation
 ```
 
+&nbsp;
 
-UNINSTALL
----------
+## uninstall
 
 if installed via script or direct download:
 
@@ -173,8 +175,8 @@ if installed from source:
 make uninstall
 ```
 
+&nbsp;
 
-LICENCE
--------
+## licence
 
 MIT
