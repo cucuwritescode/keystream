@@ -84,46 +84,44 @@ chmod +x build/scripts/preinstall
 # ── welcome text ────────────────────────────────────────────────────
 cat > build/resources/welcome.html << 'WELCOME'
 <html>
-<body style="background: #000; color: #c0c0c0; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 12px; line-height: 1.8; padding: 30px;">
+<head><meta charset="utf-8"/></head>
+<body style="font-family: Menlo, Monaco, Courier, monospace; font-size: 11px; line-height: 1.7;">
 
-<pre style="color: #e0e0e0; font-size: 14px; letter-spacing: 2px;">
-KEYSTREAM 0.1
-──────────────
+<pre>
+KEYSTREAM
+---------
+gaucho dsp laboratories
+audio synthesis subsystem
 </pre>
 
-<p style="color: #888; margin-top: 20px;">
-GAUCHO DSP LABORATORIES<br/>
-AUDIO SYNTHESIS SUBSYSTEM
+<p>
+this program converts keyboard input into
+pitched sine tones in real time.
 </p>
 
-<p style="color: #c0c0c0; margin-top: 20px;">
-this program converts keyboard input into pitched<br/>
-sine tones in real time. 32 concurrent voices.<br/>
-recursive oscillators. sub-millisecond latency.<br/>
-no external dependencies.
-</p>
-
-<pre style="color: #707070; margin-top: 20px;">
-INSTALL MANIFEST
-────────────────
-binary      /usr/local/bin/keystream
-service     /Library/LaunchAgents/com.gauchodsp.keystream.plist
+<pre>
 voices      32 concurrent
-oscillator  recursive sine (no trig in audio thread)
+oscillator  recursive sine
 latency     &lt; 1ms
 </pre>
 
-<p style="color: #e0e0e0; margin-top: 20px; border: 1px solid #444; padding: 12px; background: #111;">
-<strong style="color: #ff6b35;">ATTENTION</strong><br/><br/>
-after installation, grant accessibility permission:<br/><br/>
-&nbsp;&nbsp;system settings &gt; privacy &amp; security &gt; accessibility<br/><br/>
-without this permission, keyboard input cannot be captured.<br/>
-the system will not function.
+<p>this installer will place:</p>
+
+<pre>
+/usr/local/bin/keystream
+/Library/LaunchAgents/com.gauchodsp.keystream.plist
+</pre>
+
+<p><b>IMPORTANT</b></p>
+
+<p>
+after installation, you must grant accessibility
+permission or keystream will not function:
 </p>
 
-<p style="color: #555; margin-top: 30px; font-size: 10px;">
-READY FOR INSTALLATION
-</p>
+<pre>
+system settings &gt; privacy &amp; security &gt; accessibility
+</pre>
 
 </body>
 </html>
