@@ -31,18 +31,33 @@ prerequisites beyond macos itself.
 INSTALLATION
 ------------
 
-### homebrew
+### homebrew (recommended)
 
 ```bash
 brew tap cucuwritescode/keystream
 brew install keystream
 ```
 
+### installer (.pkg)
+
+download the `.pkg` from the
+[latest release](https://github.com/cucuwritescode/keystream/releases/latest).
+double-click to install. accessibility settings will open automatically
+after installation.
+
 ### direct download
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/cucuwritescode/keystream/main/scripts/install.sh | sh
 ```
+
+### cargo
+
+```bash
+cargo install keystream-audio
+```
+
+the binary installs as `keystream`.
 
 ### from source
 
