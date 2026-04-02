@@ -91,9 +91,15 @@ fn read_mode() -> Option<String> {
 }
 
 fn write_mode(mode: &str) {
-    if let Ok(mut file) = fs::File::create(mode_file_path()) {
-        let _ = write!(file, "{}", mode);
+    let path = mode_file_path();
+    let tmp = path.with_extension("tmp");
+    if let Ok(mut file) = fs::File::create(&tmp) {
+        if write!(file, "{}", mode).is_ok() {
+            let _ = fs::rename(&tmp, &path);
+            return;
+        }
     }
+    let _ = fs::remove_file(&tmp);
 }
 
 fn is_process_running(pid: u32) -> bool {
@@ -165,8 +171,7 @@ fn cmd_start(mode: ScaleMode, header_shown: bool) {
         .spawn();
 
     match child {
-        Ok(child) => {
-            let pid = child.id();
+        Ok(_child) => {
             if !header_shown {
                 print_header();
             }
@@ -190,7 +195,6 @@ fn cmd_start(mode: ScaleMode, header_shown: bool) {
             println!("ONLINE");
             println!();
             write_mode(mode_name(mode));
-            let _ = pid;
         }
         Err(e) => {
             if !header_shown {
@@ -468,7 +472,10 @@ fn main() {
                 match parse_mode(&args[2]) {
                     Some(m) => (m, false),
                     None => {
-                        eprintln!("error: unknown mode '{}'. available modes: pentatonic, lydian.", args[2]);
+                        eprintln!(
+                            "error: unknown mode '{}'. available modes: pentatonic, lydian.",
+                            args[2]
+                        );
                         std::process::exit(1);
                     }
                 }
@@ -488,7 +495,10 @@ fn main() {
                 match parse_mode(&args[2]) {
                     Some(m) => (m, false),
                     None => {
-                        eprintln!("error: unknown mode '{}'. available modes: pentatonic, lydian.", args[2]);
+                        eprintln!(
+                            "error: unknown mode '{}'. available modes: pentatonic, lydian.",
+                            args[2]
+                        );
                         std::process::exit(1);
                     }
                 }
@@ -498,7 +508,10 @@ fn main() {
             cmd_run(mode, header_shown);
         }
         _ => {
-            eprintln!("error: unknown command '{}'. run 'keystream --help' for usage.", cmd);
+            eprintln!(
+                "error: unknown command '{}'. run 'keystream --help' for usage.",
+                cmd
+            );
             std::process::exit(1);
         }
     }

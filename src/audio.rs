@@ -7,7 +7,8 @@ use crossbeam_channel::Receiver;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-const MASTER_GAIN: f32 = 0.025;
+//with soft clip, this gives -18dB for one voice, -1.6dB at full polyphony
+const MASTER_GAIN: f32 = 0.15;
 
 pub struct AudioEngine {
     _stream: Stream,
