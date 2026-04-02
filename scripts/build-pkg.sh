@@ -48,21 +48,10 @@ CURRENT_USER=$(stat -f "%Su" /dev/console)
 
 if [ -n "$CURRENT_USER" ] && [ "$CURRENT_USER" != "root" ]; then
     su - "$CURRENT_USER" -c "launchctl load '$PLIST'" 2>/dev/null || true
+    # open accessibility settings so the user can grant permission immediately
+    su - "$CURRENT_USER" -c "open 'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility'" 2>/dev/null || true
 fi
 
-echo ""
-echo "  ──────────────────────────────────────"
-echo "  KEYSTREAM INSTALLATION COMPLETE"
-echo "  ──────────────────────────────────────"
-echo ""
-echo "  binary    : /usr/local/bin/keystream"
-echo "  service   : loaded"
-echo ""
-echo "  REQUIRED  : grant accessibility permission"
-echo "              system settings > privacy & security > accessibility"
-echo ""
-echo "  status    : READY"
-echo ""
 exit 0
 POSTINSTALL
 chmod +x build/scripts/postinstall
@@ -84,44 +73,66 @@ chmod +x build/scripts/preinstall
 # ── welcome text ────────────────────────────────────────────────────
 cat > build/resources/welcome.html << 'WELCOME'
 <html>
-<head><meta charset="utf-8"/></head>
-<body style="font-family: Menlo, Monaco, Courier, monospace; font-size: 11px; line-height: 1.7;">
+<head>
+<meta charset="utf-8"/>
+<style>
+body {
+    font-family: Menlo, Monaco, 'Courier New', monospace;
+    font-size: 12px;
+    color: #b0b0b0;
+    background: #1a1a1a;
+    padding: 24px 28px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+.title {
+    color: #e8e8e8;
+    font-size: 18px;
+    letter-spacing: 6px;
+    font-weight: normal;
+    margin: 0 0 4px 0;
+}
+.line {
+    color: #333;
+    margin: 0 0 24px 0;
+    letter-spacing: 2px;
+}
+.dim { color: #555; }
+.label { color: #777; display: inline-block; width: 110px; }
+.value { color: #ccc; }
+.warn {
+    color: #d4d4d4;
+    background: #2a1a1a;
+    border-left: 2px solid #884444;
+    padding: 10px 14px;
+    margin: 20px 0;
+    font-size: 11px;
+}
+.status { color: #555; font-size: 10px; margin-top: 30px; letter-spacing: 3px; }
+</style>
+</head>
+<body>
 
-<pre>
-KEYSTREAM
----------
-gaucho dsp laboratories
-audio synthesis subsystem
-</pre>
+<p class="title">KEYSTREAM</p>
+<p class="line">--------------------------------</p>
+
+<p class="dim">real-time keyboard audio synthesis</p>
 
 <p>
-this program converts keyboard input into
-pitched sine tones in real time.
+<span class="label">voices</span><span class="value">32 concurrent</span><br/>
+<span class="label">oscillator</span><span class="value">recursive sine</span><br/>
+<span class="label">latency</span><span class="value">&lt; 1ms</span><br/>
+<span class="label">binary</span><span class="value">/usr/local/bin/keystream</span>
 </p>
 
-<pre>
-voices      32 concurrent
-oscillator  recursive sine
-latency     &lt; 1ms
-</pre>
+<div class="warn">
+ACCESSIBILITY PERMISSION REQUIRED<br/><br/>
+after installation, system settings will open<br/>
+automatically. add your terminal to the<br/>
+accessibility list or keystream cannot function.
+</div>
 
-<p>this installer will place:</p>
-
-<pre>
-/usr/local/bin/keystream
-/Library/LaunchAgents/com.gauchodsp.keystream.plist
-</pre>
-
-<p><b>IMPORTANT</b></p>
-
-<p>
-after installation, you must grant accessibility
-permission or keystream will not function:
-</p>
-
-<pre>
-system settings &gt; privacy &amp; security &gt; accessibility
-</pre>
+<p class="status">READY</p>
 
 </body>
 </html>
