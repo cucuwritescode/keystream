@@ -79,36 +79,38 @@ cat > build/resources/welcome.html << 'WELCOME'
 body {
     font-family: Menlo, Monaco, 'Courier New', monospace;
     font-size: 12px;
-    color: #b0b0b0;
-    background: #1a1a1a;
+    color: #aa3333;
+    background: #0a0000;
     padding: 24px 28px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
 }
 .title {
-    color: #e8e8e8;
-    font-size: 18px;
-    letter-spacing: 6px;
+    color: #ff2200;
+    font-size: 20px;
+    letter-spacing: 8px;
     font-weight: normal;
     margin: 0 0 4px 0;
+    text-shadow: 0 0 12px rgba(255,34,0,0.4);
 }
 .line {
-    color: #333;
+    color: #331111;
     margin: 0 0 24px 0;
     letter-spacing: 2px;
 }
-.dim { color: #555; }
-.label { color: #777; display: inline-block; width: 110px; }
-.value { color: #ccc; }
+.dim { color: #662222; }
+.label { color: #883333; display: inline-block; width: 110px; }
+.value { color: #dd4444; }
 .warn {
-    color: #d4d4d4;
-    background: #2a1a1a;
-    border-left: 2px solid #884444;
+    color: #ff4433;
+    background: rgba(255,34,0,0.06);
+    border-left: 2px solid #ff2200;
     padding: 10px 14px;
     margin: 20px 0;
     font-size: 11px;
+    text-shadow: 0 0 8px rgba(255,34,0,0.2);
 }
-.status { color: #555; font-size: 10px; margin-top: 30px; letter-spacing: 3px; }
+.status { color: #441111; font-size: 10px; margin-top: 30px; letter-spacing: 3px; }
 </style>
 </head>
 <body>
