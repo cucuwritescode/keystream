@@ -21,9 +21,11 @@ REQUIREMENTS
 
 ```
 macos       14.0 or later
-rust        1.70 or later
 terminal    accessibility permission required
 ```
+
+rust is only needed when building from source. binary installs have no
+prerequisites beyond macos itself.
 
 
 INSTALLATION
@@ -138,6 +140,14 @@ src/
 
 UNINSTALL
 ---------
+
+if installed via script or direct download:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/cucuwritescode/keystream/main/scripts/uninstall.sh | sh
+```
+
+if installed from source:
 
 ```bash
 make uninstall
