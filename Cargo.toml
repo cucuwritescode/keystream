@@ -2,6 +2,12 @@
 name = "keystream"
 version = "0.1.0"
 edition = "2021"
+description = "Plays sounds while you type on your keyboard"
+repository = "https://github.com/cucuwritescode/keystream"
+license = "MIT"
+readme = "README.md"
+keywords = ["audio", "keyboard", "synthesiser", "daemon", "macos"]
+categories = ["multimedia::audio", "command-line-utilities"]
 
 [dependencies]
 cpal = "0.15"
