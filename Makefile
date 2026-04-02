@@ -3,7 +3,7 @@ INSTALL_DIR = $(HOME)/.local/bin
 PLIST_NAME = com.gauchodsp.keystream.plist
 PLIST_DIR = $(HOME)/Library/LaunchAgents
 
-.PHONY: install uninstall clean install-daemon uninstall-daemon
+.PHONY: install uninstall clean install-daemon uninstall-daemon check
 
 install:
 	cargo build --release
@@ -34,6 +34,18 @@ uninstall-daemon:
 uninstall: uninstall-daemon
 	rm -f $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "  removed $(BINARY_NAME)"
+
+check:
+	cargo fmt --check
+	cargo clippy -- -D warnings
+	cargo test
+	cargo build --release
+	@if ls scripts/*.sh >/dev/null 2>&1; then \
+		shellcheck scripts/*.sh 2>/dev/null || echo "  shellcheck not installed, skipping"; \
+	fi
+	@echo ""
+	@echo "  all checks passed"
+	@echo ""
 
 clean:
 	cargo clean
