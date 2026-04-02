@@ -1,7 +1,9 @@
 BINARY_NAME = keystream
 INSTALL_DIR = $(HOME)/.local/bin
+PLIST_NAME = com.gauchodsp.keystream.plist
+PLIST_DIR = $(HOME)/Library/LaunchAgents
 
-.PHONY: install uninstall clean
+.PHONY: install uninstall clean install-daemon uninstall-daemon
 
 install:
 	cargo build --release
@@ -17,7 +19,19 @@ install:
 		echo ""; \
 	fi
 
-uninstall:
+install-daemon: install
+	@mkdir -p $(PLIST_DIR)
+	sed 's|__INSTALL_DIR__|$(INSTALL_DIR)|g' $(PLIST_NAME) > $(PLIST_DIR)/$(PLIST_NAME)
+	launchctl load $(PLIST_DIR)/$(PLIST_NAME) 2>/dev/null || true
+	@echo "  daemon installed and loaded"
+	@echo ""
+
+uninstall-daemon:
+	-launchctl unload $(PLIST_DIR)/$(PLIST_NAME) 2>/dev/null
+	rm -f $(PLIST_DIR)/$(PLIST_NAME)
+	@echo "  daemon unloaded and removed"
+
+uninstall: uninstall-daemon
 	rm -f $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "  removed $(BINARY_NAME)"
 

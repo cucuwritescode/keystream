@@ -4,8 +4,12 @@
     <dict>
         <key>Label</key>
         <string>com.gauchodsp.keystream</string>
-        <key>Program</key>
-        <string>/usr/local/bin/keystream</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>__INSTALL_DIR__/keystream</string>
+            <string>run</string>
+            <string>pentatonic</string>
+        </array>
         <key>RunAtLoad</key>
         <true/>
     </dict>
