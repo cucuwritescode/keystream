@@ -1,6 +1,11 @@
 keystream
 =========
 
+[![ci](https://github.com/cucuwritescode/keystream/actions/workflows/ci.yml/badge.svg)](https://github.com/cucuwritescode/keystream/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/keystream-audio.svg)](https://crates.io/crates/keystream-audio)
+[![homebrew](https://img.shields.io/badge/homebrew-keystream-orange)](https://github.com/cucuwritescode/homebrew-keystream)
+[![license](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 plays sounds while you type on your keyboard
 
 
