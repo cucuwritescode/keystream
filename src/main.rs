@@ -1,4 +1,4 @@
-//entry point, daemon management
+//daemon lifecycle, cli dispatch, signal handling
 mod audio;
 mod keyboard;
 mod mapping;
@@ -6,6 +6,7 @@ mod voice;
 
 use audio::AudioEngine;
 use crossbeam_channel::bounded;
+use dialoguer::{theme::SimpleTheme, Select};
 use keyboard::start_keyboard_listener;
 use mapping::{KeyMapper, ScaleMode};
 use std::env;
@@ -17,7 +18,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use dialoguer::{Select, theme::SimpleTheme};
 
 #[cfg(target_os = "macos")]
 use core_foundation::base::TCFType;
@@ -32,7 +32,8 @@ const EVENT_QUEUE_SIZE: usize = 256;
 
 #[cfg(target_os = "macos")]
 extern "C" {
-    fn AXIsProcessTrustedWithOptions(options: core_foundation::dictionary::CFDictionaryRef) -> bool;
+    fn AXIsProcessTrustedWithOptions(options: core_foundation::dictionary::CFDictionaryRef)
+        -> bool;
     fn AXIsProcessTrusted() -> bool;
 }
 
@@ -64,10 +65,17 @@ fn read_pid() -> Option<u32> {
     contents.trim().parse().ok()
 }
 
+//write to temp file then rename to prevent readers seeing partial content
 fn write_pid(pid: u32) {
-    if let Ok(mut file) = fs::File::create(pid_file_path()) {
-        let _ = write!(file, "{}", pid);
+    let path = pid_file_path();
+    let tmp = path.with_extension("tmp");
+    if let Ok(mut file) = fs::File::create(&tmp) {
+        if write!(file, "{}", pid).is_ok() {
+            let _ = fs::rename(&tmp, &path);
+            return;
+        }
     }
+    let _ = fs::remove_file(&tmp);
 }
 
 fn remove_pid() {
@@ -136,7 +144,9 @@ fn print_usage() {
 fn cmd_start(mode: ScaleMode, header_shown: bool) {
     if let Some(pid) = read_pid() {
         if is_process_running(pid) {
-            if !header_shown { print_header(); }
+            if !header_shown {
+                print_header();
+            }
             println!("daemon already running");
             println!("pid       : {}", pid);
             println!();
@@ -157,7 +167,9 @@ fn cmd_start(mode: ScaleMode, header_shown: bool) {
     match child {
         Ok(child) => {
             let pid = child.id();
-            if !header_shown { print_header(); }
+            if !header_shown {
+                print_header();
+            }
             println!("mode      : {}", mode_name(mode));
             println!("scale     : {}", mode_scale(mode));
             println!("voices    : 32");
@@ -181,7 +193,9 @@ fn cmd_start(mode: ScaleMode, header_shown: bool) {
             let _ = pid;
         }
         Err(e) => {
-            if !header_shown { print_header(); }
+            if !header_shown {
+                print_header();
+            }
             println!("failed to start daemon: {}", e);
             println!();
         }
@@ -227,7 +241,11 @@ fn cmd_status() {
         Some(pid) => {
             if is_process_running(pid) {
                 let mode = read_mode().unwrap_or_else(|| "pentatonic".to_string());
-                let scale = if mode == "lydian" { "C D E F# G A B" } else { "C D E G A" };
+                let scale = if mode == "lydian" {
+                    "C D E F# G A B"
+                } else {
+                    "C D E G A"
+                };
                 println!("daemon    : online");
                 println!("mode      : {}", mode);
                 println!("scale     : {}", scale);
@@ -248,7 +266,9 @@ fn cmd_status() {
 fn cmd_run(mode: ScaleMode, header_shown: bool) {
     #[cfg(target_os = "macos")]
     if !has_accessibility_permission() {
-        if !header_shown { print_header(); }
+        if !header_shown {
+            print_header();
+        }
         println!("requesting accessibility permission...");
         request_accessibility_permission();
         println!("grant permission and restart");
@@ -266,10 +286,12 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
 
     let (sender, receiver) = bounded(EVENT_QUEUE_SIZE);
 
-    let _audio = match AudioEngine::new(receiver) {
+    let audio = match AudioEngine::new(receiver) {
         Ok(engine) => engine,
         Err(e) => {
-            if !header_shown { print_header(); }
+            if !header_shown {
+                print_header();
+            }
             println!("audio initialisation failed: {}", e);
             println!();
             return;
@@ -281,14 +303,18 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
     let _keyboard = match start_keyboard_listener(sender, mapper) {
         Some(listener) => listener,
         None => {
-            if !header_shown { print_header(); }
+            if !header_shown {
+                print_header();
+            }
             println!("keyboard initialisation failed");
             println!();
             return;
         }
     };
 
-    if !header_shown { print_header(); }
+    if !header_shown {
+        print_header();
+    }
     println!("mode      : {}", mode_name(mode));
     println!("scale     : {}", mode_scale(mode));
     println!("voices    : 32");
@@ -308,6 +334,11 @@ fn cmd_run(mode: ScaleMode, header_shown: bool) {
     println!();
 
     while running.load(Ordering::SeqCst) {
+        if audio.has_error() {
+            println!();
+            println!("audio stream error detected");
+            break;
+        }
         thread::sleep(Duration::from_millis(100));
     }
 
@@ -336,7 +367,7 @@ fn daemon_run(mode: ScaleMode) {
 
     let (sender, receiver) = bounded(EVENT_QUEUE_SIZE);
 
-    let _audio = match AudioEngine::new(receiver) {
+    let audio = match AudioEngine::new(receiver) {
         Ok(engine) => engine,
         Err(_) => {
             remove_pid();
@@ -355,6 +386,9 @@ fn daemon_run(mode: ScaleMode) {
     };
 
     while running.load(Ordering::SeqCst) {
+        if audio.has_error() {
+            break;
+        }
         thread::sleep(Duration::from_millis(100));
     }
 
@@ -367,10 +401,7 @@ fn parse_mode(s: &str) -> Option<ScaleMode> {
 
 fn prompt_mode() -> ScaleMode {
     print_header();
-    let modes = &[
-        "pentatonic   C D E G A",
-        "lydian       C D E F# G A B",
-    ];
+    let modes = &["pentatonic   C D E G A", "lydian       C D E F# G A B"];
 
     let selection = Select::with_theme(&SimpleTheme)
         .with_prompt("select mode")

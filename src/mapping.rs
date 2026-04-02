@@ -3,8 +3,8 @@ use device_query::Keycode;
 
 #[derive(Clone, Copy, Debug)]
 pub enum ScaleMode {
-    Pentatonic,  //C D E G A
-    Lydian,      //C D E F# G A B 
+    Pentatonic, //C D E G A
+    Lydian,     //C D E F# G A B
 }
 
 impl ScaleMode {
@@ -15,7 +15,6 @@ impl ScaleMode {
             _ => None,
         }
     }
-
 }
 
 pub enum KeyMapping {
@@ -64,48 +63,48 @@ impl KeyMapper {
             //letters,melody
 
             //top row,C pentatonic
-            Keycode::Q => KeyMapping::Note(60),  // C4
-            Keycode::W => KeyMapping::Note(62),  // D4
-            Keycode::E => KeyMapping::Note(64),  // E4
-            Keycode::R => KeyMapping::Note(67),  // G4
-            Keycode::T => KeyMapping::Note(69),  // A4
-            Keycode::Y => KeyMapping::Note(72),  // C5
-            Keycode::U => KeyMapping::Note(74),  // D5
-            Keycode::I => KeyMapping::Note(76),  // E5
-            Keycode::O => KeyMapping::Note(79),  // G5
-            Keycode::P => KeyMapping::Note(81),  // A5
+            Keycode::Q => KeyMapping::Note(60), // C4
+            Keycode::W => KeyMapping::Note(62), // D4
+            Keycode::E => KeyMapping::Note(64), // E4
+            Keycode::R => KeyMapping::Note(67), // G4
+            Keycode::T => KeyMapping::Note(69), // A4
+            Keycode::Y => KeyMapping::Note(72), // C5
+            Keycode::U => KeyMapping::Note(74), // D5
+            Keycode::I => KeyMapping::Note(76), // E5
+            Keycode::O => KeyMapping::Note(79), // G5
+            Keycode::P => KeyMapping::Note(81), // A5
 
             //home row,G pentatonic (fifth below)
-            Keycode::A => KeyMapping::Note(55),  // G3
-            Keycode::S => KeyMapping::Note(57),  // A3
-            Keycode::D => KeyMapping::Note(59),  // B3
-            Keycode::F => KeyMapping::Note(62),  // D4
-            Keycode::G => KeyMapping::Note(64),  // E4
-            Keycode::H => KeyMapping::Note(67),  // G4
-            Keycode::J => KeyMapping::Note(69),  // A4
-            Keycode::K => KeyMapping::Note(71),  // B4
-            Keycode::L => KeyMapping::Note(74),  // D5
+            Keycode::A => KeyMapping::Note(55), // G3
+            Keycode::S => KeyMapping::Note(57), // A3
+            Keycode::D => KeyMapping::Note(59), // B3
+            Keycode::F => KeyMapping::Note(62), // D4
+            Keycode::G => KeyMapping::Note(64), // E4
+            Keycode::H => KeyMapping::Note(67), // G4
+            Keycode::J => KeyMapping::Note(69), // A4
+            Keycode::K => KeyMapping::Note(71), // B4
+            Keycode::L => KeyMapping::Note(74), // D5
 
             //bottom row,D pentatonic (another fifth below)
-            Keycode::Z => KeyMapping::Note(50),  // D3
-            Keycode::X => KeyMapping::Note(52),  // E3
-            Keycode::C => KeyMapping::Note(54),  // F#3
-            Keycode::V => KeyMapping::Note(57),  // A3
-            Keycode::B => KeyMapping::Note(59),  // B3
-            Keycode::N => KeyMapping::Note(62),  // D4
-            Keycode::M => KeyMapping::Note(64),  // E4
+            Keycode::Z => KeyMapping::Note(50), // D3
+            Keycode::X => KeyMapping::Note(52), // E3
+            Keycode::C => KeyMapping::Note(54), // F#3
+            Keycode::V => KeyMapping::Note(57), // A3
+            Keycode::B => KeyMapping::Note(59), // B3
+            Keycode::N => KeyMapping::Note(62), // D4
+            Keycode::M => KeyMapping::Note(64), // E4
 
             //numbers,high register accents
-            Keycode::Key1 => KeyMapping::Note(72),  // C5
-            Keycode::Key2 => KeyMapping::Note(74),  // D5
-            Keycode::Key3 => KeyMapping::Note(76),  // E5
-            Keycode::Key4 => KeyMapping::Note(79),  // G5
-            Keycode::Key5 => KeyMapping::Note(81),  // A5
-            Keycode::Key6 => KeyMapping::Note(84),  // C6
-            Keycode::Key7 => KeyMapping::Note(86),  // D6
-            Keycode::Key8 => KeyMapping::Note(88),  // E6
-            Keycode::Key9 => KeyMapping::Note(91),  // G6
-            Keycode::Key0 => KeyMapping::Note(93),  // A6
+            Keycode::Key1 => KeyMapping::Note(72), // C5
+            Keycode::Key2 => KeyMapping::Note(74), // D5
+            Keycode::Key3 => KeyMapping::Note(76), // E5
+            Keycode::Key4 => KeyMapping::Note(79), // G5
+            Keycode::Key5 => KeyMapping::Note(81), // A5
+            Keycode::Key6 => KeyMapping::Note(84), // C6
+            Keycode::Key7 => KeyMapping::Note(86), // D6
+            Keycode::Key8 => KeyMapping::Note(88), // E6
+            Keycode::Key9 => KeyMapping::Note(91), // G6
+            Keycode::Key0 => KeyMapping::Note(93), // A6
 
             //punctuation,gestures
 
@@ -156,48 +155,48 @@ impl KeyMapper {
     fn map_lydian(&self, key: Keycode) -> KeyMapping {
         match key {
             //top row,C lydian
-            Keycode::Q => KeyMapping::Note(60),  // C4
-            Keycode::W => KeyMapping::Note(62),  // D4
-            Keycode::E => KeyMapping::Note(64),  // E4
-            Keycode::R => KeyMapping::Note(66),  // F#4
-            Keycode::T => KeyMapping::Note(67),  // G4
-            Keycode::Y => KeyMapping::Note(69),  // A4
-            Keycode::U => KeyMapping::Note(71),  // B4
-            Keycode::I => KeyMapping::Note(72),  // C5
-            Keycode::O => KeyMapping::Note(74),  // D5
-            Keycode::P => KeyMapping::Note(76),  // E5
+            Keycode::Q => KeyMapping::Note(60), // C4
+            Keycode::W => KeyMapping::Note(62), // D4
+            Keycode::E => KeyMapping::Note(64), // E4
+            Keycode::R => KeyMapping::Note(66), // F#4
+            Keycode::T => KeyMapping::Note(67), // G4
+            Keycode::Y => KeyMapping::Note(69), // A4
+            Keycode::U => KeyMapping::Note(71), // B4
+            Keycode::I => KeyMapping::Note(72), // C5
+            Keycode::O => KeyMapping::Note(74), // D5
+            Keycode::P => KeyMapping::Note(76), // E5
 
             //home row,G lydian (fifth below)
-            Keycode::A => KeyMapping::Note(55),  // G3
-            Keycode::S => KeyMapping::Note(57),  // A3
-            Keycode::D => KeyMapping::Note(59),  // B3
-            Keycode::F => KeyMapping::Note(60),  // C4
-            Keycode::G => KeyMapping::Note(61),  // C#4
-            Keycode::H => KeyMapping::Note(62),  // D4
-            Keycode::J => KeyMapping::Note(64),  // E4
-            Keycode::K => KeyMapping::Note(66),  // F#4
-            Keycode::L => KeyMapping::Note(67),  // G4
+            Keycode::A => KeyMapping::Note(55), // G3
+            Keycode::S => KeyMapping::Note(57), // A3
+            Keycode::D => KeyMapping::Note(59), // B3
+            Keycode::F => KeyMapping::Note(60), // C4
+            Keycode::G => KeyMapping::Note(61), // C#4
+            Keycode::H => KeyMapping::Note(62), // D4
+            Keycode::J => KeyMapping::Note(64), // E4
+            Keycode::K => KeyMapping::Note(66), // F#4
+            Keycode::L => KeyMapping::Note(67), // G4
 
             //bottom row,D lydian (another fifth below)
-            Keycode::Z => KeyMapping::Note(50),  // D3
-            Keycode::X => KeyMapping::Note(52),  // E3
-            Keycode::C => KeyMapping::Note(54),  // F#3
-            Keycode::V => KeyMapping::Note(55),  // G3
-            Keycode::B => KeyMapping::Note(56),  // G#3
-            Keycode::N => KeyMapping::Note(57),  // A3
-            Keycode::M => KeyMapping::Note(59),  // B3
+            Keycode::Z => KeyMapping::Note(50), // D3
+            Keycode::X => KeyMapping::Note(52), // E3
+            Keycode::C => KeyMapping::Note(54), // F#3
+            Keycode::V => KeyMapping::Note(55), // G3
+            Keycode::B => KeyMapping::Note(56), // G#3
+            Keycode::N => KeyMapping::Note(57), // A3
+            Keycode::M => KeyMapping::Note(59), // B3
 
             //numbers,high lydian
-            Keycode::Key1 => KeyMapping::Note(72),  // C5
-            Keycode::Key2 => KeyMapping::Note(74),  // D5
-            Keycode::Key3 => KeyMapping::Note(76),  // E5
-            Keycode::Key4 => KeyMapping::Note(78),  // F#5
-            Keycode::Key5 => KeyMapping::Note(79),  // G5
-            Keycode::Key6 => KeyMapping::Note(81),  // A5
-            Keycode::Key7 => KeyMapping::Note(83),  // B5
-            Keycode::Key8 => KeyMapping::Note(84),  // C6
-            Keycode::Key9 => KeyMapping::Note(86),  // D6
-            Keycode::Key0 => KeyMapping::Note(88),  // E6
+            Keycode::Key1 => KeyMapping::Note(72), // C5
+            Keycode::Key2 => KeyMapping::Note(74), // D5
+            Keycode::Key3 => KeyMapping::Note(76), // E5
+            Keycode::Key4 => KeyMapping::Note(78), // F#5
+            Keycode::Key5 => KeyMapping::Note(79), // G5
+            Keycode::Key6 => KeyMapping::Note(81), // A5
+            Keycode::Key7 => KeyMapping::Note(83), // B5
+            Keycode::Key8 => KeyMapping::Note(84), // C6
+            Keycode::Key9 => KeyMapping::Note(86), // D6
+            Keycode::Key0 => KeyMapping::Note(88), // E6
 
             //punctuation,lydian gestures
             Keycode::Dot => KeyMapping::Chord(&[66, 69]), // F#4 A4 (lydian color)
@@ -207,9 +206,9 @@ impl KeyMapper {
             Keycode::BackSlash => KeyMapping::Chord(&[60, 62, 66]), // C4 D4 F#4
             Keycode::LeftBracket => KeyMapping::Chord(&[60, 66]), // C4 F#4 (tritone)
             Keycode::RightBracket => KeyMapping::Chord(&[64, 71]), // E4 B4
-            Keycode::Minus => KeyMapping::Note(48), // C3
-            Keycode::Equal => KeyMapping::Note(84), // C6
-            Keycode::Grave => KeyMapping::Note(36), // C2
+            Keycode::Minus => KeyMapping::Note(48),       // C3
+            Keycode::Equal => KeyMapping::Note(84),       // C6
+            Keycode::Grave => KeyMapping::Note(36),       // C2
             Keycode::Apostrophe => KeyMapping::Chord(&[60, 66]), // C4 F#4
 
             _ => KeyMapping::None,
