@@ -126,7 +126,7 @@ fn mode_scale(mode: ScaleMode) -> &'static str {
 
 fn print_header() {
     println!();
-    println!("KEYSTREAM 0.1");
+    println!("KEYSTREAM {}", env!("CARGO_PKG_VERSION"));
     println!("--------------");
     println!();
 }
