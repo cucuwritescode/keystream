@@ -75,66 +75,33 @@ cat > build/resources/welcome.html << 'WELCOME'
 <html>
 <head>
 <meta charset="utf-8"/>
-<style>
-body {
-    font-family: Menlo, Monaco, 'Courier New', monospace;
-    font-size: 12px;
-    color: #aa3333;
-    background: #0a0000;
-    padding: 24px 28px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-}
-.title {
-    color: #ff2200;
-    font-size: 20px;
-    letter-spacing: 8px;
-    font-weight: normal;
-    margin: 0 0 4px 0;
-    text-shadow: 0 0 12px rgba(255,34,0,0.4);
-}
-.line {
-    color: #331111;
-    margin: 0 0 24px 0;
-    letter-spacing: 2px;
-}
-.dim { color: #662222; }
-.label { color: #883333; display: inline-block; width: 110px; }
-.value { color: #dd4444; }
-.warn {
-    color: #ff4433;
-    background: rgba(255,34,0,0.06);
-    border-left: 2px solid #ff2200;
-    padding: 10px 14px;
-    margin: 20px 0;
-    font-size: 11px;
-    text-shadow: 0 0 8px rgba(255,34,0,0.2);
-}
-.status { color: #441111; font-size: 10px; margin-top: 30px; letter-spacing: 3px; }
-</style>
 </head>
-<body>
+<body style="font-family: Menlo, Monaco, Courier, monospace; font-size: 12px; line-height: 1.8;">
 
-<p class="title">KEYSTREAM</p>
-<p class="line">--------------------------------</p>
+<font color="#cc3300" size="5"><b>KEYSTREAM</b></font>
+<br/>
+<font color="#661100">--------------------------------</font>
+<br/><br/>
 
-<p class="dim">real-time keyboard audio synthesis</p>
+<font color="#993322">real-time keyboard audio synthesis</font>
+<br/><br/>
 
-<p>
-<span class="label">voices</span><span class="value">32 concurrent</span><br/>
-<span class="label">oscillator</span><span class="value">recursive sine</span><br/>
-<span class="label">latency</span><span class="value">&lt; 1ms</span><br/>
-<span class="label">binary</span><span class="value">/usr/local/bin/keystream</span>
-</p>
+<font color="#884422">voices &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#cc4433">32 concurrent</font><br/>
+<font color="#884422">oscillator &nbsp;</font><font color="#cc4433">recursive sine</font><br/>
+<font color="#884422">latency &nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#cc4433">&lt; 1ms</font><br/>
+<font color="#884422">binary &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#cc4433">/usr/local/bin/keystream</font>
+<br/><br/>
 
-<div class="warn">
-ACCESSIBILITY PERMISSION REQUIRED<br/><br/>
-after installation, system settings will open<br/>
-automatically. add your terminal to the<br/>
+<font color="#cc3300"><b>ACCESSIBILITY PERMISSION REQUIRED</b></font>
+<br/><br/>
+<font color="#aa4433">
+after installation, system settings will open
+automatically. add your terminal to the
 accessibility list or keystream cannot function.
-</div>
+</font>
+<br/><br/>
 
-<p class="status">READY</p>
+<font color="#552211">READY</font>
 
 </body>
 </html>
