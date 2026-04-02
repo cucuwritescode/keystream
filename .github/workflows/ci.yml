@@ -43,3 +43,15 @@ jobs:
 
       - name: build
         run: cargo build --release
+
+  audit:
+    name: audit
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: audit dependencies
+        run: cargo audit
