@@ -198,7 +198,13 @@ impl VoiceManager {
             return;
         }
         self.time += 1;
-        let idx = self.allocate_voice();
+
+        //retrigger: reuse the voice already playing this note
+        //prevents key-repeat from consuming the entire voice pool
+        let idx = self
+            .find_voice_for_note(note)
+            .unwrap_or_else(|| self.allocate_voice());
+
         self.voices[idx].start(
             note,
             &self.table,
@@ -227,6 +233,12 @@ impl VoiceManager {
             output += voice.process();
         }
         output
+    }
+
+    fn find_voice_for_note(&self, note: u8) -> Option<usize> {
+        self.voices.iter().position(|v| {
+            v.note_id == note && (v.state == VoiceState::Attack || v.state == VoiceState::Sustain)
+        })
     }
 
     //priority: free voice > quietest releasing voice > oldest active voice
@@ -414,6 +426,25 @@ mod tests {
         assert_eq!(vm.voices[1].state, VoiceState::Release);
         //voice 2 (note 67) should still sustain
         assert_eq!(vm.voices[2].state, VoiceState::Sustain);
+    }
+
+    #[test]
+    fn retrigger_reuses_voice_on_key_repeat() {
+        let mut vm = VoiceManager::new(TEST_SAMPLE_RATE);
+
+        vm.note_on(60);
+        vm.note_on(64);
+
+        //simulate key repeat: press 60 again without releasing
+        vm.note_on(60);
+
+        //should still only use 2 voices, not 3
+        let active_count = vm
+            .voices
+            .iter()
+            .filter(|v| v.state != VoiceState::Off)
+            .count();
+        assert_eq!(active_count, 2, "key repeat should retrigger, not allocate");
     }
 
     #[test]
