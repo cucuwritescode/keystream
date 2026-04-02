@@ -29,10 +29,39 @@ terminal    accessibility permission required
 INSTALLATION
 ------------
 
+### homebrew
+
+```bash
+brew tap cucuwritescode/keystream
+brew install keystream
+```
+
+### direct download
+
+```bash
+curl -sSL https://raw.githubusercontent.com/cucuwritescode/keystream/main/scripts/install.sh | sh
+```
+
+### from source
+
 ```bash
 git clone https://github.com/cucuwritescode/keystream
 cd keystream
 make install
+```
+
+### daemon (launchd)
+
+to run keystream as a background service:
+
+```bash
+make install-daemon
+```
+
+to stop and remove the daemon:
+
+```bash
+make uninstall-daemon
 ```
 
 
