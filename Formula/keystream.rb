@@ -5,7 +5,7 @@ class Keystream < Formula
   version "0.1.0"
 
   url "https://github.com/cucuwritescode/keystream/releases/download/v#{version}/keystream"
-  sha256 "" # updated on each release
+  sha256 "e5051d6c653201479bf4473ce041d092310aa23c023a138c3304a4e1d79ee54d"
 
   depends_on :macos
 
